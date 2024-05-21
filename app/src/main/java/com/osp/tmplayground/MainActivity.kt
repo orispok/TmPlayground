@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -19,13 +20,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TmPlaygroundTheme {
-                TmPlaygroundTheme {
-                    // TODO: 1. Welcome user with connect button.
-                    // TODO: 2. get the `uid` by calling `AuthService.getUid()`.
-                    // TODO: 3. Then, fetch the profile using `DatabaseService.fetchProfile(uid)`.
-                    // TODO: 4. get missing profile data by register screens flow.
-                    // TODO: 5. Finally, show user profile.
-                }
+                // TODO: 1. Welcome user with connect button.
+                // TODO: 2. get the `uid` by calling `AuthService.getUid()`.
+                // TODO: 3. Then, fetch the profile using `DatabaseService.fetchProfile(uid)`.
+                // TODO: 4. get missing profile data by register screens flow.
+                // TODO: 5. Finally, show user profile.
             }
         }
     }
@@ -38,11 +37,14 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+
     @Preview(showBackground = true)
     @Composable
     fun GreetingPreview() {
         TmPlaygroundTheme {
-            Greeting("Android")
+            Box(modifier = Modifier.fillMaxSize()) {
+                Greeting("Androidddd")
+            }
         }
     }
 }

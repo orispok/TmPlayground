@@ -8,4 +8,12 @@ data class Profile(
     val description: String="",
     val height: Int=0,
     val gender: Gender?=null,
+    val preferencesMatch: PreferencesMatch = PreferencesMatch(),
+)
+
+data class PreferencesMatch (
+    var maxDistance: Int? = null,
+    var ageMin: Int = 0,
+    var ageMax: Int = 0,
+    var dateGender: Gender? = null,
 )
