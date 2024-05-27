@@ -9,6 +9,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
+
+
+
 @Composable
 fun TmPlaygroundTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -24,6 +27,29 @@ fun TmPlaygroundTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        content = content
+    )
+}
+
+
+
+@Composable
+fun SignInWithGoogleTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    val colorScheme = if (darkTheme) {
+        dynamicDarkColorScheme(context)
+    }
+    else {
+        dynamicLightColorScheme(context)
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+//        shapes = Shapes,
         content = content
     )
 }

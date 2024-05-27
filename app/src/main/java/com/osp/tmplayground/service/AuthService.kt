@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 
 object AuthService {
     fun getUid(): String {
+        println("in getUid")
         return uIds.random()
     }
 

@@ -16,21 +16,22 @@ object DatabaseService {
     val profiles: List<Profile> = listOf(
         Profile(
             uid = "onlyName",
-            name = "John Doe",
+//            name = "Renana Rimon",
         ),
         Profile(
             uid = "fullProfile",
             name = "Jane Doe",
-            age = 23,
-            imageUrl = "https://example.com/janedoe.jpg",
-            description = "Hello, I'm Jane Doe",
-            height = 170,
-            gender = Gender.Male,
-            preferencesMatch = PreferencesMatch(
-                maxDistance = 100,
-                ageMin = 20,
-                ageMax = 30,
-            ),
+//            age = 23,
+//            imageUrl = "https://example.com/janedoe.jpg",
+//            description = "Hello, I'm Jane Doe",
+//            height = 170,
+//            gender = Gender.Male,
+//            preferencesMatch = PreferencesMatch(
+//                maxDistance = 100,
+//                ageMin = 20,
+//                ageMax = 30,
+//                dateGender = Gender.Female
+//            ),
         )
     )
 
