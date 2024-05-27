@@ -1,17 +1,25 @@
 package com.osp.tmplayground.service
 
 import android.app.DatePickerDialog
+import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.osp.tmplayground.data.Gender
 import com.osp.tmplayground.data.Profile
 import com.osp.tmplayground.data.setAge
 import com.osp.tmplayground.data.setName
@@ -71,14 +80,37 @@ fun ProfileInputScreen(
                 )
 
                 "age" -> GetAgeInput(
-                    onValueChange = { input -> onProfileChange(profile.copy(age = input as Int))
+                    onValueChange = { input ->
+                        onProfileChange(profile.copy(age = input as Int))
                         onScreenChange("ProfileInputScreen", "imageUrl")
                     }
                 )
 
-                "imageUrl" -> GetInput(label = "URL", value = profile.imageUrl) {
+                "imageUrl" -> GetInput(
+                    label = "URL",
+                    value = profile.imageUrl,
+                    onValueChange = { input ->
+                        onProfileChange(profile.copy(imageUrl = input))
+                    })
 
-                }
+                "description" -> GetInput(
+                    label = "Tell us about yourself :)",
+                    value = profile.description,
+                    onValueChange = { input -> onProfileChange(profile.copy(description = input)) }
+                )
+
+                "height" -> GetSliderInput(
+                    label = "Pick your height",
+                    onValueChange = { input ->
+                        onProfileChange(profile.copy(height = input))
+                    })
+
+                "gender" -> GetGenderInput(
+                    label = "gender",
+                    value = profile.gender ?: Gender.Male,
+                    onValueChange = { input -> onProfileChange(profile.copy(gender = input))
+                    }
+                )
             }
 
             Button(onClick = {
@@ -115,8 +147,6 @@ fun GetInput(
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth()
     )
-
-
 }
 
 
@@ -163,20 +193,118 @@ fun calculateAge(dateInMillis: Long): Int {
     return age
 }
 
-
-@Preview(widthDp = 220, heightDp = 420)
 @Composable
-fun GetAgeInputPreview() {
-//    GetAgeInput()
+fun GetSliderInput(
+    modifier: Modifier = Modifier,
+    label: String,
+    onValueChange: (Int) -> Unit,
+) {
+    val sliderPosition = remember { mutableFloatStateOf(0.0F) }
+    Text(text = label)
+    Text(text = "${sliderPosition.floatValue.toInt()} cm")
+    Slider(
+
+        value = sliderPosition.floatValue,
+        onValueChange = { newValue ->
+            sliderPosition.floatValue = newValue
+            onValueChange(newValue.toInt())
+        },
+        valueRange = 40f..130f, // Assuming height range from 100cm to 250cm
+        steps = 0, // No steps between values
+        modifier = Modifier.fillMaxWidth(0.8f)
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GetGenderInput(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: Gender,
+    onValueChange: (Gender) -> Unit,
+) {
+    val expanded = remember { mutableStateOf(false) }
+    val newValue = remember {
+        mutableStateOf<Gender>(value)
+    }
+    ExposedDropdownMenuBox(
+        expanded = expanded.value,
+        onExpandedChange = {
+            expanded.value = !expanded.value
+        }
+    ) {
+        TextField(
+            value = newValue.value.toString(),
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+            modifier = Modifier.menuAnchor()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false }
+        ) {
+            Gender.entries
+                .forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item.toString()) },
+                        onClick = {
+                         newValue.value = item
+                        expanded.value = false
+                        onValueChange(item)
+                        }
+                    )
+                }
+        }
+    }
+//    TextField(
+//        label = { Text(label) },
+//        value = value,
+//        onValueChange = onValueChange,
+//        modifier = Modifier.fillMaxWidth()
+//    )
+}
+
+//@Preview
+//@Composable
+//fun GetSliderInputPreview(){
+//    GetSliderInput(label = "height", onValueChange = { input -> onProfileChange(profile.copy(height = input))
+//        onScreenChange("Profile", "gender")}))
+//}
+
+//@Preview(widthDp = 220, heightDp = 420)
+//@Composable
+//fun GetAgeInputPreview() {
+////    GetAgeInput()
+//}
+//
+//
+//@Preview(widthDp = 220, heightDp = 420)
+//@Composable
+//fun RegisterPagePreview() {
+//    val profile = Profile(
+//        uid = "onlyName",
+//        name = "Renana Rimon"
+//    )
+////    RegisterPage(profile = profile, registerStep = "age", onScreenChange = {"GetNameInput", "name" -> })
+//}
 
 @Preview(widthDp = 220, heightDp = 420)
 @Composable
-fun RegisterPagePreview() {
-    val profile = Profile(
-        uid = "onlyName",
-        name = "Renana Rimon"
+fun ProfileInputScreenPreview() {
+    val screen = remember { mutableStateOf("welcome") }
+    val registerStep = remember { mutableStateOf<String?>(null) }
+    var profile = Profile(
+        uid = "onlyName"
+
     )
-//    RegisterPage(profile = profile, registerStep = "age", onScreenChange = {"GetNameInput", "name" -> })
+    ProfileInputScreen(
+        profile = profile,
+        registerStep = "gender",
+        onProfileChange = { newProfile -> profile = newProfile },
+        onScreenChange = { screenName, step ->
+            screen.value = screenName
+            registerStep.value = step
+        })
 }
