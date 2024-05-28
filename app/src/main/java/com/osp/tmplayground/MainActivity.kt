@@ -51,7 +51,6 @@ class MainActivity : ComponentActivity() {
                         onFetchedProfile = { p -> profile.value = p }
                     )
 
-//                    "signup" -> SignUp()
                     "Profile" -> profile.value?.let { ProfilePage(profile = it) }
                     "Register" -> profile.value?.let {
                         registerStep.value?.let { it1 ->
@@ -85,23 +84,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-
-//                    "GetNameInput" -> profile.value?.let {
-//                        GetNameInput(
-//                            profile = it,
-//                            onValueChange = { input ->
-//                                when (registerStep.value) {
-//                                    "name" -> profile.value =
-//                                        profile.value!!.setName(input.toString())
-//
-//                                }
-//                            },
-//                            onScreenChange = { screenName, step ->
-//                                screen.value = screenName
-//                                registerStep.value = step
-//                            }
-//                        )
-//                    }
                 }
 
             }

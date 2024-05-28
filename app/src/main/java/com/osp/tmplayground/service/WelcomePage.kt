@@ -86,10 +86,10 @@ fun getFirstEmptyField(profile: Profile): String? {
         profile.description.isBlank() -> "description"
         profile.height == 0 -> "height"
         profile.gender == null -> "gender"
-        profile.preferencesMatch.maxDistance == null -> "preferencesMatch.maxDistance"
-        profile.preferencesMatch.ageMin == 0 -> "preferencesMatch.ageMin"
-        profile.preferencesMatch.ageMax == 0 -> "preferencesMatch.ageMax"
-        profile.preferencesMatch.dateGender == null -> "preferencesMatch.dateGender"
+        profile.preferencesMatch.maxDistance == null -> "preferencesMatch"
+        profile.preferencesMatch.ageMin == 0 -> "preferencesMatch"
+        profile.preferencesMatch.ageMax == 0 -> "preferencesMatch"
+        profile.preferencesMatch.dateGender == null -> "preferencesMatch"
         else -> null // All fields have values
     }
 }

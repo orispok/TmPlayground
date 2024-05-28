@@ -21,10 +21,10 @@ object DatabaseService {
         Profile(
             uid = "fullProfile",
             name = "Jane Doe",
-//            age = 23,
-//            imageUrl = "https://example.com/janedoe.jpg",
-//            description = "Hello, I'm Jane Doe",
-//            height = 170,
+            age = 23,
+            imageUrl = "https://example.com/janedoe.jpg",
+            description = "Hello, I'm Jane Doe",
+            height = 170,
 //            gender = Gender.Male,
 //            preferencesMatch = PreferencesMatch(
 //                maxDistance = 100,

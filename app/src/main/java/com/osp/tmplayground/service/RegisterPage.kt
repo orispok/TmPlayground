@@ -1,6 +1,7 @@
 package com.osp.tmplayground.service
 
 import android.app.DatePickerDialog
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.osp.tmplayground.data.Gender
+import com.osp.tmplayground.data.PreferencesMatch
 import com.osp.tmplayground.data.Profile
 import com.osp.tmplayground.data.setAge
 import com.osp.tmplayground.data.setName
@@ -103,14 +105,70 @@ fun ProfileInputScreen(
                     label = "Pick your height",
                     onValueChange = { input ->
                         onProfileChange(profile.copy(height = input))
-                    })
+                    },
+                    measurementUnit = "cm",
+                    minVal = 80f,
+                    maxVal = 250f
+                )
 
                 "gender" -> GetGenderInput(
-                    label = "gender",
-                    value = profile.gender ?: Gender.Male,
-                    onValueChange = { input -> onProfileChange(profile.copy(gender = input))
+//                    label = "gender",
+                    value = profile.gender,
+                    onValueChange = { input ->
+                        onProfileChange(profile.copy(gender = input))
                     }
                 )
+
+                "preferencesMatch" -> {
+                    val preferencesMatch = remember {
+                        mutableStateOf<PreferencesMatch>(profile.preferencesMatch)
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(
+                            5.dp,
+                            Alignment.CenterVertically
+                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "preferences match\nWho you want to date?")
+                        GetSliderInput(
+                            label = "max distance",
+                            onValueChange = { input -> preferencesMatch.value.maxDistance = input
+                                            onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))},
+                            measurementUnit = "km",
+                            minVal = 0f,
+                            maxVal = 1000f
+                        )
+
+                        GetSliderInput(
+                            label = "min age",
+                            onValueChange = { input -> preferencesMatch.value.ageMin = input
+                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))},
+                            measurementUnit = "years",
+                            minVal = 18f,
+                            maxVal = 70f
+                        )
+
+                        GetSliderInput(
+                            label = "max age",
+                            onValueChange = { input -> preferencesMatch.value.ageMax = input
+                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))},
+                            measurementUnit = "years",
+                            minVal = 18f,
+                            maxVal = 70f
+                        )
+                    }
+
+                    GetGenderInput(
+//                        label = "I want to date:",
+                        value = profile.preferencesMatch.dateGender,
+                        onValueChange = { input -> preferencesMatch.value.dateGender = input
+                            onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))}
+
+                    )
+
+                }
             }
 
             Button(onClick = {
@@ -123,7 +181,12 @@ fun ProfileInputScreen(
                     "gender" -> "preferencesMatch"
                     else -> "name"
                 }
-                onScreenChange("ProfileInputScreen", nextStep)
+                val screen = when(registerStep){
+                    "preferencesMatch" -> "Profile"
+                    else -> "ProfileInputScreen"
+                }
+
+                onScreenChange(screen, nextStep)
             }) {
                 Text(text = "next")
             }
@@ -198,10 +261,13 @@ fun GetSliderInput(
     modifier: Modifier = Modifier,
     label: String,
     onValueChange: (Int) -> Unit,
+    measurementUnit: String,
+    minVal: Float,
+    maxVal: Float
 ) {
     val sliderPosition = remember { mutableFloatStateOf(0.0F) }
     Text(text = label)
-    Text(text = "${sliderPosition.floatValue.toInt()} cm")
+    Text(text = "${sliderPosition.floatValue.toInt()} $measurementUnit")
     Slider(
 
         value = sliderPosition.floatValue,
@@ -209,7 +275,7 @@ fun GetSliderInput(
             sliderPosition.floatValue = newValue
             onValueChange(newValue.toInt())
         },
-        valueRange = 40f..130f, // Assuming height range from 100cm to 250cm
+        valueRange = minVal..maxVal,
         steps = 0, // No steps between values
         modifier = Modifier.fillMaxWidth(0.8f)
     )
@@ -219,13 +285,13 @@ fun GetSliderInput(
 @Composable
 fun GetGenderInput(
     modifier: Modifier = Modifier,
-    label: String,
-    value: Gender,
+//    label: String,
+    value: Gender?,
     onValueChange: (Gender) -> Unit,
 ) {
     val expanded = remember { mutableStateOf(false) }
     val newValue = remember {
-        mutableStateOf<Gender>(value)
+        mutableStateOf<Gender?>(value)
     }
     ExposedDropdownMenuBox(
         expanded = expanded.value,
@@ -233,8 +299,9 @@ fun GetGenderInput(
             expanded.value = !expanded.value
         }
     ) {
+
         TextField(
-            value = newValue.value.toString(),
+            value = if (newValue.value != null) newValue.value.toString() else "Gender",
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
@@ -250,20 +317,14 @@ fun GetGenderInput(
                     DropdownMenuItem(
                         text = { Text(text = item.toString()) },
                         onClick = {
-                         newValue.value = item
-                        expanded.value = false
-                        onValueChange(item)
+                            newValue.value = item
+                            expanded.value = false
+                            onValueChange(item)
                         }
                     )
                 }
         }
     }
-//    TextField(
-//        label = { Text(label) },
-//        value = value,
-//        onValueChange = onValueChange,
-//        modifier = Modifier.fillMaxWidth()
-//    )
 }
 
 //@Preview
@@ -301,7 +362,7 @@ fun ProfileInputScreenPreview() {
     )
     ProfileInputScreen(
         profile = profile,
-        registerStep = "gender",
+        registerStep = "preferencesMatch",
         onProfileChange = { newProfile -> profile = newProfile },
         onScreenChange = { screenName, step ->
             screen.value = screenName
