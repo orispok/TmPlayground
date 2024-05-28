@@ -93,5 +93,8 @@ dependencies {
 //    implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+    implementation ("androidx.activity:activity-compose:1.9.0")
+    implementation ("io.coil-kt:coil-compose:2.1.0")
 }
 

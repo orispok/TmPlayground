@@ -16,7 +16,7 @@ object DatabaseService {
     val profiles: List<Profile> = listOf(
         Profile(
             uid = "onlyName",
-//            name = "Renana Rimon",
+            name = "Renana Rimon",
         ),
         Profile(
             uid = "fullProfile",
@@ -25,13 +25,13 @@ object DatabaseService {
             imageUrl = "https://example.com/janedoe.jpg",
             description = "Hello, I'm Jane Doe",
             height = 170,
-//            gender = Gender.Male,
-//            preferencesMatch = PreferencesMatch(
-//                maxDistance = 100,
-//                ageMin = 20,
-//                ageMax = 30,
-//                dateGender = Gender.Female
-//            ),
+            gender = Gender.Male,
+            preferencesMatch = PreferencesMatch(
+                maxDistance = 100,
+                ageMin = 20,
+                ageMax = 30,
+                dateGender = Gender.Female
+            ),
         )
     )
 

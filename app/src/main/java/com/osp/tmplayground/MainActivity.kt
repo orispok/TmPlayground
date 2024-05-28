@@ -55,12 +55,8 @@ class MainActivity : ComponentActivity() {
                     "Register" -> profile.value?.let {
                         registerStep.value?.let { it1 ->
                             RegisterPage(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, bottom = 20.dp)
-                                    .fillMaxSize(),
                                 profile = it,
                                 registerStep = it1,
-
                                 onScreenChange = { screenName, step ->
                                     screen.value = screenName
                                     registerStep.value = step
@@ -71,9 +67,6 @@ class MainActivity : ComponentActivity() {
 
                     "ProfileInputScreen" -> profile.value?.let {
                         ProfileInputScreen(
-                            modifier = Modifier
-                                .padding(top = 20.dp, bottom = 20.dp)
-                                .fillMaxSize(),
                             profile = it,
                             registerStep = registerStep.value,
                             onScreenChange = { screenName, step ->

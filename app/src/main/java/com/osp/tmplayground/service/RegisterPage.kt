@@ -1,13 +1,18 @@
 package com.osp.tmplayground.service
 
 import android.app.DatePickerDialog
-import androidx.annotation.FloatRange
-import androidx.annotation.IntRange
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
@@ -19,9 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import com.osp.tmplayground.data.Gender
 import com.osp.tmplayground.data.PreferencesMatch
 import com.osp.tmplayground.data.Profile
-import com.osp.tmplayground.data.setAge
-import com.osp.tmplayground.data.setName
 import java.util.Calendar
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.rememberAsyncImagePainter
 
 
 @Composable
@@ -46,12 +49,14 @@ fun RegisterPage(
 ) {
     Surface(
         modifier
+            .padding(top = 20.dp, bottom = 20.dp)
+            .fillMaxSize()
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Hi ${profile.name}! \n you almost there! \n few more steps to create your account :)\n next step: $registerStep")
+            Text(text = "Hi ${profile.name}, you almost there! \n few more steps to create your account :)")
             ElevatedButton(onClick = { onScreenChange("ProfileInputScreen", registerStep) }) {
                 Text(text = "Continue")
             }
@@ -72,12 +77,16 @@ fun ProfileInputScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val inputIsNull = remember {
+                mutableStateOf(true)
+            }
             when (registerStep) {
                 "name" -> GetInput(
                     label = "name",
                     value = profile.name,
                     onValueChange = { input ->
                         onProfileChange(profile.copy(name = input))
+                        inputIsNull.value = input == "" // check that there is input
                     }
                 )
 
@@ -85,26 +94,29 @@ fun ProfileInputScreen(
                     onValueChange = { input ->
                         onProfileChange(profile.copy(age = input as Int))
                         onScreenChange("ProfileInputScreen", "imageUrl")
+
                     }
                 )
-
-                "imageUrl" -> GetInput(
-                    label = "URL",
-                    value = profile.imageUrl,
-                    onValueChange = { input ->
-                        onProfileChange(profile.copy(imageUrl = input))
-                    })
+                // input: uri
+                "imageUrl" -> GetImageInput(onImageSelected = { input ->
+                    onProfileChange(profile.copy(imageUrl = input.toString()))
+                    inputIsNull.value = input.toString() == ""
+                })
 
                 "description" -> GetInput(
                     label = "Tell us about yourself :)",
                     value = profile.description,
-                    onValueChange = { input -> onProfileChange(profile.copy(description = input)) }
+                    onValueChange = { input ->
+                        onProfileChange(profile.copy(description = input))
+                        inputIsNull.value = input == ""
+                    }
                 )
 
                 "height" -> GetSliderInput(
                     label = "Pick your height",
                     onValueChange = { input ->
                         onProfileChange(profile.copy(height = input))
+                        inputIsNull.value = input == 0
                     },
                     measurementUnit = "cm",
                     minVal = 80f,
@@ -112,10 +124,10 @@ fun ProfileInputScreen(
                 )
 
                 "gender" -> GetGenderInput(
-//                    label = "gender",
                     value = profile.gender,
                     onValueChange = { input ->
                         onProfileChange(profile.copy(gender = input))
+                        inputIsNull.value = false
                     }
                 )
 
@@ -134,8 +146,12 @@ fun ProfileInputScreen(
                         Text(text = "preferences match\nWho you want to date?")
                         GetSliderInput(
                             label = "max distance",
-                            onValueChange = { input -> preferencesMatch.value.maxDistance = input
-                                            onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))},
+                            onValueChange = { input ->
+                                preferencesMatch.value.maxDistance = input
+                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
+                                inputIsNull.value =
+                                    preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                            },
                             measurementUnit = "km",
                             minVal = 0f,
                             maxVal = 1000f
@@ -143,8 +159,12 @@ fun ProfileInputScreen(
 
                         GetSliderInput(
                             label = "min age",
-                            onValueChange = { input -> preferencesMatch.value.ageMin = input
-                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))},
+                            onValueChange = { input ->
+                                preferencesMatch.value.ageMin = input
+                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
+                                inputIsNull.value =
+                                    preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                            },
                             measurementUnit = "years",
                             minVal = 18f,
                             maxVal = 70f
@@ -152,8 +172,12 @@ fun ProfileInputScreen(
 
                         GetSliderInput(
                             label = "max age",
-                            onValueChange = { input -> preferencesMatch.value.ageMax = input
-                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))},
+                            onValueChange = { input ->
+                                preferencesMatch.value.ageMax = input
+                                onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
+                                inputIsNull.value =
+                                    preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                            },
                             measurementUnit = "years",
                             minVal = 18f,
                             maxVal = 70f
@@ -161,10 +185,13 @@ fun ProfileInputScreen(
                     }
 
                     GetGenderInput(
-//                        label = "I want to date:",
                         value = profile.preferencesMatch.dateGender,
-                        onValueChange = { input -> preferencesMatch.value.dateGender = input
-                            onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))}
+                        onValueChange = { input ->
+                            preferencesMatch.value.dateGender = input
+                            onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
+                            inputIsNull.value =
+                                preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                        }
 
                     )
 
@@ -181,12 +208,16 @@ fun ProfileInputScreen(
                     "gender" -> "preferencesMatch"
                     else -> "name"
                 }
-                val screen = when(registerStep){
+                val screen = when (registerStep) {
                     "preferencesMatch" -> "Profile"
                     else -> "ProfileInputScreen"
                 }
+                //if there is a value in the input
+                if (!inputIsNull.value) {
+                    onScreenChange(screen, nextStep)
+                    inputIsNull.value = true
+                }
 
-                onScreenChange(screen, nextStep)
             }) {
                 Text(text = "next")
             }
@@ -216,9 +247,6 @@ fun GetInput(
 @Composable
 fun GetAgeInput(onValueChange: (Any) -> Unit) {
     val context = LocalContext.current
-    val selectedDate = remember { mutableStateOf("") }
-    val calculatedAge = remember { mutableIntStateOf(0) }
-
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
@@ -228,11 +256,13 @@ fun GetAgeInput(onValueChange: (Any) -> Unit) {
         DatePickerDialog(context, { _, selectedYear, selectedMonth, selectedDay ->
             val dob = Calendar.getInstance()
             dob.set(selectedYear, selectedMonth, selectedDay)
-            selectedDate.value = "${selectedDay}/${selectedMonth + 1}/${selectedYear}"
-
-            calculatedAge.intValue = calculateAge(dob.timeInMillis)
-            onValueChange(calculatedAge.intValue)
+            onValueChange(calculateAge(dob.timeInMillis))
         }, year, month, day)
+
+    datePickerDialog.setOnCancelListener {
+        // Show the dialog again if the user tries to cancel
+        datePickerDialog.show()
+    }
 
     Column(
         modifier = Modifier
@@ -247,9 +277,7 @@ fun calculateAge(dateInMillis: Long): Int {
     val dob = Calendar.getInstance()
     dob.timeInMillis = dateInMillis
     val today = Calendar.getInstance()
-
     var age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR)
-
     if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
         age -= 1
     }
@@ -276,7 +304,7 @@ fun GetSliderInput(
             onValueChange(newValue.toInt())
         },
         valueRange = minVal..maxVal,
-        steps = 0, // No steps between values
+        steps = 0,
         modifier = Modifier.fillMaxWidth(0.8f)
     )
 }
@@ -285,7 +313,6 @@ fun GetSliderInput(
 @Composable
 fun GetGenderInput(
     modifier: Modifier = Modifier,
-//    label: String,
     value: Gender?,
     onValueChange: (Gender) -> Unit,
 ) {
@@ -327,29 +354,48 @@ fun GetGenderInput(
     }
 }
 
-//@Preview
-//@Composable
-//fun GetSliderInputPreview(){
-//    GetSliderInput(label = "height", onValueChange = { input -> onProfileChange(profile.copy(height = input))
-//        onScreenChange("Profile", "gender")}))
-//}
+@Composable
+fun GetImageInput(
+    modifier: Modifier = Modifier,
+    onImageSelected: (Uri?) -> Unit
+) {
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
 
-//@Preview(widthDp = 220, heightDp = 420)
-//@Composable
-//fun GetAgeInputPreview() {
-////    GetAgeInput()
-//}
-//
-//
-//@Preview(widthDp = 220, heightDp = 420)
-//@Composable
-//fun RegisterPagePreview() {
-//    val profile = Profile(
-//        uid = "onlyName",
-//        name = "Renana Rimon"
-//    )
-////    RegisterPage(profile = profile, registerStep = "age", onScreenChange = {"GetNameInput", "name" -> })
-//}
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri.value = uri
+        onImageSelected(uri)
+    }
+
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = { launcher.launch("image/*") }) {
+            Text(text = "Pick an Image")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Image(
+            painter = rememberAsyncImagePainter(model = selectedImageUri.value),
+            contentDescription = null,
+            modifier = Modifier.size(200.dp),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ImagePickerPreview() {
+    GetImageInput(onImageSelected = {})
+}
+
 
 @Preview(widthDp = 220, heightDp = 420)
 @Composable

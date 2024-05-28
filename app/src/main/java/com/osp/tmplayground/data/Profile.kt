@@ -18,10 +18,4 @@ data class PreferencesMatch (
     var dateGender: Gender? = null,
 )
 
-fun Profile.setName(name: String): Profile {
-    return this.copy(name = name)
-}
 
-fun Profile.setAge(age: Int): Profile {
-    return this.copy(age = age)
-}
