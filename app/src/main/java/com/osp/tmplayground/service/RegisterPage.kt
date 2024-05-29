@@ -100,7 +100,7 @@ fun ProfileInputScreen(
                 // input: uri
                 "imageUrl" -> GetImageInput(onImageSelected = { input ->
                     onProfileChange(profile.copy(imageUrl = input.toString()))
-                    inputIsNull.value = input.toString() == ""
+                    inputIsNull.value = input.toString() == "null"
                 })
 
                 "description" -> GetInput(
@@ -150,7 +150,7 @@ fun ProfileInputScreen(
                                 preferencesMatch.value.maxDistance = input
                                 onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
                                 inputIsNull.value =
-                                    preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                                    preferencesMatch.value.ageMin == 0 && preferencesMatch.value.ageMax == 0
                             },
                             measurementUnit = "km",
                             minVal = 0f,
@@ -163,7 +163,7 @@ fun ProfileInputScreen(
                                 preferencesMatch.value.ageMin = input
                                 onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
                                 inputIsNull.value =
-                                    preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                                    preferencesMatch.value.ageMin == 0 && preferencesMatch.value.ageMax == 0
                             },
                             measurementUnit = "years",
                             minVal = 18f,
@@ -176,7 +176,7 @@ fun ProfileInputScreen(
                                 preferencesMatch.value.ageMax = input
                                 onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
                                 inputIsNull.value =
-                                    preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                                    preferencesMatch.value.ageMin == 0 && preferencesMatch.value.ageMax == 0
                             },
                             measurementUnit = "years",
                             minVal = 18f,
@@ -190,7 +190,7 @@ fun ProfileInputScreen(
                             preferencesMatch.value.dateGender = input
                             onProfileChange(profile.copy(preferencesMatch = preferencesMatch.value))
                             inputIsNull.value =
-                                preferencesMatch.value.ageMin > 0 && preferencesMatch.value.ageMax > 0
+                                preferencesMatch.value.ageMin == 0 && preferencesMatch.value.ageMax == 0
                         }
 
                     )
@@ -239,7 +239,7 @@ fun GetInput(
         label = { Text(label) },
         value = value,
         onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().size(200.dp)
     )
 }
 

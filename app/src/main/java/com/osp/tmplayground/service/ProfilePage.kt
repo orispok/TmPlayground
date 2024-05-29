@@ -3,10 +3,12 @@ package com.osp.tmplayground.service
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +23,7 @@ import com.osp.tmplayground.data.PreferencesMatch
 import com.osp.tmplayground.data.Profile
 
 @Composable
-fun ProfilePage(modifier: Modifier = Modifier, profile: Profile) {
+fun ProfilePage(modifier: Modifier = Modifier, profile: Profile, onScreenChange: (String, String?)->Unit) {
     Surface(
         modifier
             .padding(top = 20.dp, bottom = 20.dp)
@@ -45,10 +47,16 @@ fun ProfilePage(modifier: Modifier = Modifier, profile: Profile) {
             Text(text = "description: ${profile.description}")
             Text(text = "height: ${profile.height}")
             Text(text = "gender: ${profile.gender}")
-            Text(text = "\npreferencesMatch: \n   max distance:${profile.preferencesMatch.maxDistance}")
-            Text(text = "   min age:${profile.preferencesMatch.ageMin}")
-            Text(text = "   max age:${profile.preferencesMatch.ageMax}")
-            Text(text = "   date gender:${profile.preferencesMatch.dateGender}")
+            Text(text = "\npreferencesMatch: \n   max distance: ${profile.preferencesMatch.maxDistance}")
+            Text(text = "   min age: ${profile.preferencesMatch.ageMin}")
+            Text(text = "   max age: ${profile.preferencesMatch.ageMax}")
+            Text(text = "   date gender: ${profile.preferencesMatch.dateGender}")
+
+
+            Spacer(modifier = modifier.padding(16.dp))
+            ElevatedButton(onClick = { onScreenChange("welcome", null) }) {
+                Text(text = "Sign Out")
+            }
         }
     }
 }
@@ -70,5 +78,5 @@ fun ProfilePagePreview() {
             ageMax = 30,
         )
     )
-    ProfilePage(profile = profile)
+    ProfilePage(profile = profile, onScreenChange = {a, b -> a+b})
 }

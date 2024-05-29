@@ -51,12 +51,23 @@ class MainActivity : ComponentActivity() {
                         onFetchedProfile = { p -> profile.value = p }
                     )
 
-                    "Profile" -> profile.value?.let { ProfilePage(profile = it) }
+                    "Profile" -> profile.value?.let {
+                        ProfilePage(profile = it,
+                            onScreenChange = { screenName, step ->
+                            screen.value = screenName
+                            registerStep.value = step
+                        })
+                    }
+
                     "Register" -> profile.value?.let {
                         registerStep.value?.let { it1 ->
                             RegisterPage(
+                                modifier = Modifier
+                                    .padding(top = 20.dp, bottom = 20.dp)
+                                    .fillMaxSize(),
                                 profile = it,
                                 registerStep = it1,
+
                                 onScreenChange = { screenName, step ->
                                     screen.value = screenName
                                     registerStep.value = step
@@ -67,13 +78,16 @@ class MainActivity : ComponentActivity() {
 
                     "ProfileInputScreen" -> profile.value?.let {
                         ProfileInputScreen(
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 20.dp)
+                                .fillMaxSize(),
                             profile = it,
                             registerStep = registerStep.value,
                             onScreenChange = { screenName, step ->
                                 screen.value = screenName
                                 registerStep.value = step
                             },
-                            onProfileChange = { newProfile -> profile.value = newProfile}
+                            onProfileChange = { newProfile -> profile.value = newProfile }
                         )
                     }
 
