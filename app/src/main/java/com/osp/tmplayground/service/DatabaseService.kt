@@ -16,7 +16,7 @@ object DatabaseService {
     val profiles: List<Profile> = listOf(
         Profile(
             uid = "onlyName",
-            name = "John Doe",
+            name = "Renana Rimon",
         ),
         Profile(
             uid = "fullProfile",
@@ -30,6 +30,7 @@ object DatabaseService {
                 maxDistance = 100,
                 ageMin = 20,
                 ageMax = 30,
+                dateGender = Gender.Female
             ),
         )
     )

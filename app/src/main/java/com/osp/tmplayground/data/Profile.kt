@@ -17,3 +17,5 @@ data class PreferencesMatch (
     var ageMax: Int = 0,
     var dateGender: Gender? = null,
 )
+
+
